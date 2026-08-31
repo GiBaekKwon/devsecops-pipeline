@@ -5,16 +5,16 @@
 단순 스캔 리포트 생성이 아니라 심각도 기준 미달 시 배포 자체를 막는 정책 게이트를 목표로 합니다.
 
 ## 아키텍처
+```text
 Code Push → GitHub Actions
-├─ SAST (Semgrep)
-├─ SCA (Trivy fs scan)
-├─ Secret Scan (Gitleaks)
-├─ Docker Build
-├─ Container Scan (Trivy image scan)
-└─ 정책 게이트 (Critical/High 발견 시 배포 차단)
-↓ (통과 시)
-NCP Container Registry → NCP 배포
-
+ ├── SAST (Semgrep)
+ ├── SCA (Trivy fs scan)
+ ├── Secret Scan (Gitleaks)
+ ├── Docker Build
+ ├── Container Scan (Trivy image scan)
+ └── 정책 게이트 (Critical/High 발견 시 배포 차단)
+      ↓ (통과 시)
+ NCP Container Registry → NCP 배포
 
 ## 기술 스택
 - CI/CD: GitHub Actions
