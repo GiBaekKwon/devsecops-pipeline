@@ -15,6 +15,7 @@ Code Push → GitHub Actions
  └─ 정책 게이트 (Critical/High 발견 시 배포 차단)
      ↓ (통과 시)
  NCP Container Registry → NCP 배포
+```
 
 ## 기술 스택
 - CI/CD: GitHub Actions
