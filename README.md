@@ -33,7 +33,14 @@ NCP Container Registry → NCP 배포
 - [ ] 정책 게이트 (자동 차단) 구현
 
 ## 스캔 결과 (Before)
-[Trivy 스캔 결과](docs/trivy-scan-before.png)
-
 의도적으로 오래된 베이스 이미지(`python:3.9-slim-buster`, EOL)를 사용해
 Trivy가 실제로 다수의 취약점을 탐지하는지 검증했습니다.
+
+### 1. 전체 요약 결과
+![Trivy 요약](docs/trivy-scan-1.png)
+
+### 2. OS 패키지 상세 취약점
+![OS 스캔](docs/trivy-scan-2.png)
+
+### 3. Python 패키지 상세 취약점
+![Python 스캔](docs/trivy-scan-3.png)
