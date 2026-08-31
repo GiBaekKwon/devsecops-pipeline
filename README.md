@@ -5,6 +5,7 @@
 단순 스캔 리포트 생성이 아니라 심각도 기준 미달 시 배포 자체를 막는 정책 게이트를 목표로 합니다.
 
 ## 아키텍처
+```text
 Code Push → GitHub Actions
  ├─ SAST (Semgrep)
  ├─ SCA (Trivy fs scan)
