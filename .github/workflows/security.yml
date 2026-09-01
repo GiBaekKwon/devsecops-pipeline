@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  trivy-scan:
+  trivy-fs-scan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,7 +21,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           exit-code: '1'
 
-trivy-image-scan:
+  trivy-image-scan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
