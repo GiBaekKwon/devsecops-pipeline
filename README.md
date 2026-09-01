@@ -49,7 +49,7 @@ Trivy가 실제로 다수의 취약점을 탐지하는지 검증했습니다.
 push 시 자동으로 fs scan + image scan이 실행되고, 취약점 발견 시 파이프라인이 스스로 실패(차단)합니다.
 
 ### 4. 두 스캔 job 실행 결과 (fs-scan / image-scan 모두 실패 = 정상 차단)
-![Actions 실행 결과](docs/actions-log-detail.png)
+![Actions 실행 결과](docs/actions-summary-final.png)
 
 ### 5. Image scan 상세 로그
-![Image scan 로그](docs/actions-summary-view.png)
+![Image scan 로그](docs/actions-log-final.png)
