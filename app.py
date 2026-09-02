@@ -4,8 +4,8 @@ import sqlite3
 app = Flask(__name__)
 
 # 취약점 1: 하드코딩된 시크릿 (Gitleaks가 탐지해야 할 대상)
-API_SECRET_KEY = "sk_live_51H8xJ2KZ9example_hardcoded_secret"
-DB_PASSWORD = "admin1234!"
+API_SECRET_KEY = "AKIAIOSFODNN7EXAMPLE"
+DB_PASSWORD = "Sup3r$ecretP@ssw0rd2024"
 
 def get_db():
     conn = sqlite3.connect("test.db")
