@@ -9,7 +9,8 @@
 Code Push → GitHub Actions
   ├─ trivy-fs-scan    : 코드/의존성 취약점 스캔 (SCA)
   ├─ trivy-image-scan : Docker Build → 이미지 취약점 스캔
-  └─ gitleaks-scan     : 하드코딩된 시크릿(API 키, 비밀번호 등) 탐지
+  ├─ gitleaks-scan     : 하드코딩된 시크릿(API 키, 비밀번호 등) 탐지
+  └─ semgrep-scan      : 코드 로직 취약점 탐지 (SAST)
        ↓
   Critical/High 취약점 또는 시크릿 발견 시 파이프라인 실패 (배포 차단)
        ↓ (통과 시, 예정)
@@ -22,6 +23,7 @@ Code Push → GitHub Actions
 - Secret Scan: Gitleaks
 - Container: Docker
 - Cloud (예정): Naver Cloud Platform (NCR)
+- SAST: Semgrep
 
 ## 진행 현황
 - [x] 테스트용 취약점 Flask 앱 작성
@@ -30,7 +32,7 @@ Code Push → GitHub Actions
 - [x] GitHub Actions 자동화 (fs scan + image scan, 2-job 구조)
 - [x] 정책 게이트 구현 — Critical/High 발견 시 파이프라인 자동 실패(차단) 확인 완료
 - [x] Gitleaks 시크릿 스캔 단계 추가 — 하드코딩 시크릿 탐지 및 차단 확인 완료
-- [ ] Semgrep SAST 단계 추가
+- [x] Semgrep SAST 단계 추가 — 15건 발견(SQL Injection, 디버그 모드 노출 등) 및 차단 확인 완료
 - [ ] NCP Container Registry 연동
 - [ ] 결과를 GitHub Security 탭(SARIF)에 연동
 
@@ -41,6 +43,7 @@ Code Push → GitHub Actions
 | Trivy (fs scan) | 코드/의존성 | Critical, High | 다수 발견 | 자동 차단 |
 | Trivy (image scan) | Docker 이미지 (`python:3.9-slim-buster`) | Critical 2 / High 40 | 42건 | 자동 차단 |
 | Gitleaks | 소스코드 내 하드코딩 시크릿 | generic-api-key (AWS 키 패턴) | 1건 (app.py:7) | 자동 차단 |
+| Semgrep | 소스코드 로직 (`app.py`) | SQL Injection, 디버그 모드 노출, 호스트 바인딩 위험 등 | 15건 | 자동 차단 |
 
 ## 스캔 결과 (Before — 로컬 수동 스캔)
 의도적으로 오래된 베이스 이미지(`python:3.9-slim-buster`, EOL)를 사용해
@@ -69,3 +72,7 @@ push 시 자동으로 fs scan + image scan + secret scan이 실행되고,
 의도적으로 하드코딩해둔 `API_SECRET_KEY`(AWS 키 형식)가 `app.py` 7번째 줄에서
 실제로 탐지되는지 검증했습니다.
 ![Gitleaks 스캔 로그](docs/gitleaks-scan-log.png)
+
+### 7. Semgrep SAST 탐지 로그
+SQL Injection, Flask 디버그 모드 노출, 호스트 바인딩 위험 등 코드 로직 수준의 취약점을 탐지했습니다.
+![Semgrep 스캔 로그](docs/semgrep-scan-log.png)
