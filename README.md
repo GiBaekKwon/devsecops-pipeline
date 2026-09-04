@@ -96,4 +96,4 @@ non-root 사용자 적용 후 4개 스캔이 모두 통과하자 `push-to-ncr`�
 
 ### 10. NCP Container Registry 배포 확인
 실제로 이미지가 NCR에 push되어 보안 취약점 검사도 통과(Passed)한 것을 확인했습니다.
-![NCR 콘솔 확인](docs/ncr-console-verified.png)
+![NCR 콘솔 확인](docs/ncr-console-verified-2.png)
