@@ -12,28 +12,33 @@ Code Push → GitHub Actions
   ├─ gitleaks-scan     : 하드코딩된 시크릿(API 키, 비밀번호 등) 탐지
   └─ semgrep-scan      : 코드 로직 취약점 탐지 (SAST)
        ↓
-  Critical/High 취약점 또는 시크릿 발견 시 파이프라인 실패 (배포 차단)
-       ↓ (통과 시, 예정)
-  NCP Container Registry → NCP 배포
+  4개 스캔 모두 통과해야만 다음 단계 진행 (needs 의존성)
+       ↓
+  push-to-ncr : NCP Container Registry로 이미지 push
 ```
+
+취약점·시크릿이 하나라도 발견되면 해당 스캔 job이 실패하고,
+`push-to-ncr`은 실행 자체가 **Skipped** 처리되어 배포가 원천 차단됩니다.
 
 ## 기술 스택
 - CI/CD: GitHub Actions
 - SCA / Container Scan: Trivy
 - Secret Scan: Gitleaks
-- Container: Docker
-- Cloud (예정): Naver Cloud Platform (NCR)
 - SAST: Semgrep
+- Container: Docker (Alpine 기반, non-root 사용자)
+- Cloud: Naver Cloud Platform (NCP Container Registry)
+- Supply Chain Security: GitHub Actions 커밋 SHA 고정
 
 ## 진행 현황
 - [x] 테스트용 취약점 Flask 앱 작성
 - [x] Dockerfile 작성 및 로컬 빌드 확인
 - [x] Trivy 로컬 스캔 (Critical 2 / High 40 발견)
-- [x] GitHub Actions 자동화 (fs scan + image scan, 2-job 구조)
+- [x] GitHub Actions 자동화 (4개 스캔 job 구성)
 - [x] 정책 게이트 구현 — Critical/High 발견 시 파이프라인 자동 실패(차단) 확인 완료
 - [x] Gitleaks 시크릿 스캔 단계 추가 — 하드코딩 시크릿 탐지 및 차단 확인 완료
-- [x] Semgrep SAST 단계 추가 — 15건 발견(SQL Injection, 디버그 모드 노출 등) 및 차단 확인 완료
-- [ ] NCP Container Registry 연동
+- [x] Semgrep SAST 단계 추가 — SQL Injection 등 다수 취약점 탐지 및 차단 확인 완료
+- [x] NCP Container Registry 연동 — 스캔 통과 시에만 이미지 push되는 정책 게이트 완성
+- [x] GitHub Actions 커밋 SHA 고정 — 공급망 공격(supply chain attack) 방지
 - [ ] 결과를 GitHub Security 탭(SARIF)에 연동
 
 ## 탐지된 취약점 요약
@@ -59,7 +64,7 @@ Trivy가 실제로 다수의 취약점을 탐지하는지 검증했습니다.
 ![Python 스캔](docs/trivy-scan-3.png)
 
 ## 파이프라인 자동화 결과 (After — GitHub Actions)
-push 시 자동으로 fs scan + image scan + secret scan이 실행되고,
+push 시 자동으로 4개 스캔(fs scan + image scan + secret scan + SAST)이 실행되고,
 취약점이나 시크릿 발견 시 파이프라인이 스스로 실패(차단)합니다.
 
 ### 4. 스캔 job 실행 결과
@@ -76,3 +81,19 @@ push 시 자동으로 fs scan + image scan + secret scan이 실행되고,
 ### 7. Semgrep SAST 탐지 로그
 SQL Injection, Flask 디버그 모드 노출, 호스트 바인딩 위험 등 코드 로직 수준의 취약점을 탐지했습니다.
 ![Semgrep 스캔 로그](docs/semgrep-scan-log.png)
+
+## 배포 게이트 검증 (Deploy Gate — 차단/통과 시나리오)
+스캔 결과에 따라 실제 배포(NCR push)가 조건부로 실행되는지 두 가지 시나리오로 검증했습니다.
+
+### 8. 차단 시나리오 — 취약점 발견 시 배포 자동 차단
+4개 스캔 중 하나라도 실패하면 `push-to-ncr`은 실행되지 않고 **Skipped** 처리됩니다.
+![배포 차단 시나리오](docs/ncr-block-scenario.png)
+
+### 9. 통과 시나리오 — 취약점 해결 후 배포 자동 실행
+SQL Injection 수정, 하드코딩 시크릿 제거, Alpine 기반 이미지 전환(Trivy 취약점 0건),
+non-root 사용자 적용 후 4개 스캔이 모두 통과하자 `push-to-ncr`이 정상 실행되었습니다.
+![배포 통과 시나리오](docs/ncr-pass-scenario.png)
+
+### 10. NCP Container Registry 배포 확인
+실제로 이미지가 NCR에 push되어 보안 취약점 검사도 통과(Passed)한 것을 확인했습니다.
+![NCR 콘솔 확인](docs/ncr-console-verified.png)
