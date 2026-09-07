@@ -39,7 +39,7 @@ Code Push → GitHub Actions
 - [x] Semgrep SAST 단계 추가 — SQL Injection 등 다수 취약점 탐지 및 차단 확인 완료
 - [x] NCP Container Registry 연동 — 스캔 통과 시에만 이미지 push되는 정책 게이트 완성
 - [x] GitHub Actions 커밋 SHA 고정 — 공급망 공격(supply chain attack) 방지
-- [ ] 결과를 GitHub Security 탭(SARIF)에 연동
+- [x] 결과를 GitHub Security 탭(SARIF)에 연동 — Trivy·Semgrep 결과 173건 대시보드 시각화 완료
 
 ## 탐지된 취약점 요약
 
@@ -97,3 +97,15 @@ non-root 사용자 적용 후 4개 스캔이 모두 통과하자 `push-to-ncr`�
 ### 10. NCP Container Registry 배포 확인
 실제로 이미지가 NCR에 push되어 보안 취약점 검사도 통과(Passed)한 것을 확인했습니다.
 ![NCR 콘솔 확인](docs/ncr-console-verified-2.png)
+
+## GitHub Security 탭 연동
+Trivy·Semgrep 스캔 결과를 SARIF 포맷으로 GitHub Security 탭에 업로드해,
+CI 로그를 직접 뒤지지 않고도 발견된 취약점을 대시보드 형태로 확인할 수 있게 구성했습니다.
+
+### 11. Code scanning 결과 (173건)
+파일명, 라인 번호, 심각도(Critical/High)별로 취약점이 자동 분류되어 표시됩니다.
+![GitHub Security 탭](docs/security-tab-sarif.png)
+
+> 참고: GitHub이 "No summary of scanned files" 경고를 표시하지만, 이는 Trivy·Semgrep의 SARIF 출력이
+> GitHub의 선택적 메타데이터 필드(스캔 파일 요약)를 아직 채우지 않아 발생하는 알려진 도구 자체의 한계이며,
+> 취약점 탐지 결과(파일명·라인·심각도) 자체는 정상적으로 반영됩니다.
